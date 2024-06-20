@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Capture and Submit</title>
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(to right, #000000, #33526d);
+      color: #fff;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    video {
+      display: block;
+      margin: 0 auto;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    #loading {
+      display: none;
+      width: 50px;
+      height: 50px;
+      border: 5px solid #ccc;
+      border-top-color: #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px 0;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    #imageContainer {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+    #imageContainer img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin: 0 10px;
+    }
+    #submitForm {
+      display: none;
+      margin-top: 20px;
+    }
+    #captureBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    #result {
+      display: none;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-top: 20px;
+    }
+    #downloadBtn, #restartBtn {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    #restartBtn {
+      background-color: #dc3545;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <section id="main">
+    <h1>Image Capture and Submit</h1>
+    <video id="video" width="480" height="270" autoplay></video>
+    <button id="captureBtn">Capture Image</button>
+    <div id="imageContainer">
+      <img id="imagePreview1" src="#" alt="Image 1" />
+      <img id="imagePreview2" src="#" alt="Image 2" />
+      <img id="imagePreview3" src="#" alt="Image 3" />
+    </div>
+    <form id="submitForm">
+      <input type="submit" value="Submit Images" />
+    </form>
+  </section>
+  <img id="result" src="" alt="Result Image" />
+  <div id="loading"></div>
+  <button id="downloadBtn">Download Result Image</button>
+  <button id="restartBtn">Restart</button>
+
+  <script>
+    var loadingElement = document.getElementById("loading");
+    var main = document.getElementById("main");
+    const video = document.getElementById("video");
+    const captureBtn = document.getElementById("captureBtn");
+    const imagePreviews = [
+      document.getElementById("imagePreview1"),
+      document.getElementById("imagePreview2"),
+      document.getElementById("imagePreview3"),
+    ];
+    let currentImageIndex = 0;
+    const capturedImages = [];
+
+    // Start the video stream
+    async function startVideoStream() {
+      const constraints = {
+        video: true,
+        audio: false,
+      };
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+      } catch (error) {
+        console.error("Error accessing the camera:", error);
+      }
+    }
+
+    // Function to handle image capture
+    captureBtn.addEventListener("click", () => {
+      if (currentImageIndex >= 3) {
+        alert("All images have been captured");
+        return;
+      }
+      try {
+        const capturedImage = captureImage();
+        capturedImages.push(capturedImage);
+        displayImagePreview(capturedImage, currentImageIndex);
+        currentImageIndex++;
+        if (currentImageIndex === 3) {
+          document.getElementById("submitForm").style.display = "block";
+        }
+      } catch (error) {
+        console.error("Error capturing image:", error);
+      }
+    });
+
+    // Function to capture image from the video stream
+    function captureImage() {
+      const canvas = document.createElement("canvas");
+      canvas.width = 960;
+      canvas.height = 1280;
+      const context = canvas.getContext("2d");
+      context.drawImage(video, 0, 0, 960, 1280);
+      return canvas.toDataURL("image/png");
+    }
+
+    // Function to display captured image preview
+    function displayImagePreview(imageDataURL, index) {
+      imagePreviews[index].src = imageDataURL;
+    }
+
+    // Form submission handling (sending images to server)
+    const submitForm = document.getElementById("submitForm");
+    submitForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      main.style.display = "none";
+      loadingElement.style.display = "block";
+
+      const formData = new FormData();
+
+      // Collect image data URLs
+      for (let i = 0; i < capturedImages.length; i++) {
+        const blob = dataURLToBlob(capturedImages[i]);
+        formData.append(`image${i + 1}`, blob, `image${i + 1}.png`);
+      }
+
+      // Send images to server
+      try {
+        const response = await fetch("/upload-images", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to upload images");
+        }
+
+        const responseData = await response.json();
+        console.log("Images uploaded successfully:", responseData);
+        document.getElementById("result").src = `../uploads/${responseData.imageName}`;
+        loadingElement.style.display = "none";
+        document.getElementById("result").style.display = "block";
+
+        // Show download and restart buttons
+        document.getElementById("downloadBtn").style.display = "block";
+        document.getElementById("restartBtn").style.display = "block";
+      } catch (error) {
+        console.error("Error uploading images:", error);
+      }
+    });
+
+    // Convert data URL to Blob
+    function dataURLToBlob(dataURL) {
+      const parts = dataURL.split(",");
+      const byteString = atob(parts[1]);
+      const mimeString = parts[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mimeString });
+    }
+
+    // Download button functionality
+    document.getElementById("downloadBtn").addEventListener("click", function () {
+      const resultImage = document.getElementById("result");
+      const imageSrc = resultImage.src;
+
+      if (imageSrc) {
+        const a = document.createElement("a");
+        a.href = imageSrc;
+        a.download = "result_image.png";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        alert("No image to download.");
+      }
+    });
+
+    // Restart button functionality
+    document.getElementById("restartBtn").addEventListener("click", function () {
+      // Reset captured images array and current image index
+      capturedImages.length = 0;
+      currentImageIndex = 0;
+
+      // Reset image previews
+      imagePreviews.forEach((preview) => {
+        preview.src = "#";
+      });
+
+      // Reset result image display
+      document.getElementById("result").src = "";
+      document.getElementById("result").style.display = "none";
+
+      // Reset form display
+      document.getElementById("submitForm").style.display = "none";
+
+      // Show main section and start video stream again
+      main.style.display = "block";
+      startVideoStream();
+
+      // Hide download and restart buttons again
+      document.getElementById("downloadBtn").style.display = "none";
+      document.getElementById("restartBtn").style.display = "none";
+    });
+
+    // Start the video stream on page load
+    startVideoStream();
+  </script>
+</body>
+</html>
