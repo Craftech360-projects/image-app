@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Image Capture and Submit</title>
   <style>
     body {
@@ -67,6 +67,8 @@
     }
     #result {
       display: none;
+      max-width: 300px; /* Ensure the image does not exceed its container */
+      max-height: 800px;
       border: 2px solid #fff;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       margin-top: 20px;
@@ -256,16 +258,11 @@
       // Reset form display
       document.getElementById("submitForm").style.display = "none";
 
-      // Show main section and start video stream again
+      // Show main section again
       main.style.display = "block";
-      startVideoStream();
-
-      // Hide download and restart buttons again
-      document.getElementById("downloadBtn").style.display = "none";
-      document.getElementById("restartBtn").style.display = "none";
     });
 
-    // Start the video stream on page load
+    // Start the video stream when the page loads
     startVideoStream();
   </script>
 </body>

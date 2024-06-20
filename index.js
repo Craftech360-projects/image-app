@@ -18,6 +18,7 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve the uploads directory statically
+app.use('/outputs', express.static(path.join(__dirname, 'outputs'))); // Serve the uploads directory statically
 
 // Render the home page using EJS
 app.get("/", (req, res) => {
@@ -26,6 +27,10 @@ app.get("/", (req, res) => {
 
 app.get("/capture", (req, res) => {
     res.render("capture");
+});
+
+app.get("/show", (req, res) => {
+    res.render("show");
 });
 
 app.post('/upload-images', upload.fields([{ name: 'image1' }, { name: 'image2' }, { name: 'image3' }]), async (req, res) => {
@@ -72,16 +77,18 @@ app.post('/upload-images', upload.fields([{ name: 'image1' }, { name: 'image2' }
             .toFile(outputPath);
 
         console.log('Image processing complete! Image saved at:', imageName);
-        res.status(200).send({ message: 'Images processed successfully', imageName });
+        
+        // Call mergeImages function with imageName
+        await mergeImages(imageName, res);
     } catch (err) {
         console.error('Error processing images:', err);
         res.status(500).send('Error processing images');
     }
 });
 
-app.post('/upload', upload.single('image'), async (req, res) => {
-    const imagePath = req.file.path;
-    const outputFilePath = path.join('uploads', `output_${req.file.filename}.png`);
+async function mergeImages(imageName, res) {
+    const imagePath = path.join('uploads', imageName);
+    const outputFilePath = path.join('outputs', `output_${imageName}.png`);
 
     try {
         const image = sharp(imagePath);
@@ -94,12 +101,42 @@ app.post('/upload', upload.single('image'), async (req, res) => {
             })
             .toFile(outputFilePath);
 
-        res.json({ imageUrl: `/uploads/output_${req.file.filename}.png` });
+        res.json({ imageName:imageName });
     } catch (error) {
+        console.error('Error processing image:', error);
         res.status(500).send('Error processing image');
     }
-});
+}
 
+// Endpoint to fetch images
+app.get('/fetch-images', (req, res) => {
+    const folderPath = path.join(__dirname, 'outputs');
+    
+    // Read directory and get file stats
+    fs.readdir(folderPath, (err, files) => {
+        if (err) {
+            console.error('Error reading directory:', err);
+            res.status(500).json({ error: 'Failed to fetch images' });
+            return;
+        }
+
+        // Filter only files with image extensions (adjust as per your file types)
+        const imageFiles = files.filter(file => /\.(jpg|jpeg|png|gif)$/i.test(file));
+
+        // Get file stats and prepare response
+        const images = imageFiles.map(file => {
+            const filePath = path.join(folderPath, file);
+            const stats = fs.statSync(filePath);
+            return {
+                filename: file,
+                path: `outputs/${file}`, // Assuming the 'outputs' folder is served statically
+                date: stats.mtime // Use file modification time for sorting
+            };
+        });
+
+        res.json(images);
+    });
+});
 app.listen(port, () => {
     console.log(`Server started on http://localhost:${port}`);
 });

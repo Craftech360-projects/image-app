@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Showcase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(to right, #000000, #33526d);
+            color: #fff;
+        }
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .image-box {
+            width: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .image-box img {
+            max-width: 100%;
+            height: auto;
+        }
+        .download-btn {
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recent Images</h1>
+    <div class="image-container" id="imageContainer">
+        <!-- Images will be dynamically added here -->
+    </div>
+
+    <script>
+        async function fetchImages() {
+            try {
+                const response = await fetch('/fetch-images'); // Replace with your server endpoint
+                if (!response.ok) {
+                    throw new Error('Failed to fetch images');
+                }
+                const images = await response.json();
+                displayImages(images);
+            } catch (error) {
+                console.error('Error fetching images:', error);
+            }
+        }
+
+        function displayImages(images) {
+            const imageContainer = document.getElementById('imageContainer');
+            
+            // Sort images by date (most recent first)
+            images.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Clear existing content
+            imageContainer.innerHTML = '';
+
+            // Add images to the container
+            images.forEach(image => {
+                const imageBox = document.createElement('div');
+                imageBox.classList.add('image-box');
+
+                const img = document.createElement('img');
+                img.src = image.path;
+                img.alt = image.filename;
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'Download';
+                downloadBtn.classList.add('download-btn');
+                downloadBtn.addEventListener('click', () => {
+                    downloadImage(image.path, image.filename);
+                });
+
+                imageBox.appendChild(img);
+                imageBox.appendChild(downloadBtn);
+                imageContainer.appendChild(imageBox);
+            });
+        }
+
+        function downloadImage(imagePath, imageName) {
+            const a = document.createElement('a');
+            a.href = imagePath;
+            a.download = imageName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Fetch images when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchImages();
+        });
+    </script>
+</body>
+</html>
