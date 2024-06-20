@@ -18,7 +18,7 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve the uploads directory statically
-app.use('/outputs', express.static(path.join(__dirname, 'outputs'))); // Serve the uploads directory statically
+// app.use('/outputs', express.static(path.join(__dirname, 'outputs'))); // Serve the uploads directory statically
 
 // Render the home page using EJS
 app.get("/", (req, res) => {
@@ -88,7 +88,7 @@ app.post('/upload-images', upload.fields([{ name: 'image1' }, { name: 'image2' }
 
 async function mergeImages(imageName, res) {
     const imagePath = path.join('uploads', imageName);
-    const outputFilePath = path.join('outputs', `output_${imageName}.png`);
+    const outputFilePath = path.join('uploads/outputs/', `output_${imageName}.png`);
 
     try {
         const image = sharp(imagePath);
@@ -110,7 +110,7 @@ async function mergeImages(imageName, res) {
 
 // Endpoint to fetch images
 app.get('/fetch-images', (req, res) => {
-    const folderPath = path.join(__dirname, 'outputs');
+    const folderPath = path.join(__dirname, 'uploads/outputs/');
     
     // Read directory and get file stats
     fs.readdir(folderPath, (err, files) => {
@@ -129,7 +129,7 @@ app.get('/fetch-images', (req, res) => {
             const stats = fs.statSync(filePath);
             return {
                 filename: file,
-                path: `outputs/${file}`, // Assuming the 'outputs' folder is served statically
+                path: `uploads/outputs/${file}`, // Assuming the 'outputs' folder is served statically
                 date: stats.mtime // Use file modification time for sorting
             };
         });
