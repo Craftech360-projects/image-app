@@ -15,7 +15,6 @@ const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpbWlzdGNxbG5kbmVpbWFsc3RsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTAyMDA1NjIsImV4cCI6MjAwNTc3NjU2Mn0.qHDDDVAtqG37P0nS9dqzvX6VWSMX00KsV877YXgdf38";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Configure multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -25,7 +24,6 @@ app.set("views", path.join(__dirname, "views"));
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Serve the uploads directory statically
 
 // Render the home page using EJS
 app.get("/", (req, res) => {
@@ -51,7 +49,7 @@ app.post(
     }
 
     const templatePath = "./main.jpeg";
-    const folderPath = path.join(__dirname, "uploads");
+    const folderPath = path.join(__dirname, "public/uploads");
 
     // Create the folder
     fs.mkdirSync(folderPath, { recursive: true });
@@ -92,8 +90,8 @@ app.post(
         .toFile(outputPath);
 
       console.log("Image processing complete! Image saved at:", imageName);
-      const imagePath = path.join('uploads', imageName);
-      const outputFilePath = path.join('uploads/outputs/', `output_${imageName}.png`);
+      const imagePath = path.join('public/uploads', imageName);
+      const outputFilePath = path.join('public/outputs/', `output_${imageName}.png`);
     
       try {
           const image = sharp(imagePath);
@@ -121,6 +119,7 @@ app.post(
 
 async function uploadImageToSupabase(imageName, outputPath, res) {
   try {
+    // await mergeImages(imageName, res);
     const fileBuffer = fs.readFileSync(outputPath);
     const { data, error } = await supabase.storage
       .from("test-bucket") // Replace with your actual bucket name
@@ -140,31 +139,9 @@ async function uploadImageToSupabase(imageName, outputPath, res) {
   }
 }
 
-async function mergeImages(imageName, res) {
-  const imagePath = path.join('uploads', imageName);
-  const outputFilePath = path.join('uploads/outputs/', `output_${imageName}.png`);
-
-  try {
-      const image = sharp(imagePath);
-      const metadata = await image.metadata();
-
-      await image
-          .extend({
-              left: metadata.width,
-              background: { r: 255, g: 255, b: 255, alpha: 1 }
-          })
-          .toFile(outputFilePath);
-
-      // res.json({ imageName:imageName });
-  } catch (error) {
-      console.error('Error processing image:', error);
-      res.status(500).send('Error processing image');
-  }
-}
-
 // Endpoint to fetch images
 app.get("/fetch-images", (req, res) => {
-  const folderPath = path.join(__dirname, "uploads/outputs/");
+  const folderPath = path.join(__dirname, "public/outputs/");
 
   // Read directory and get file stats
   fs.readdir(folderPath, (err, files) => {
@@ -185,7 +162,7 @@ app.get("/fetch-images", (req, res) => {
       const stats = fs.statSync(filePath);
       return {
         filename: file,
-        path: `uploads/outputs/${file}`, // Assuming the 'outputs' folder is served statically
+        path: `public/outputs/${file}`, // Assuming the 'outputs' folder is served statically
         date: stats.mtime, // Use file modification time for sorting
       };
     });
