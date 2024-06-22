@@ -91,7 +91,7 @@ app.post(
 
       console.log("Image processing complete! Image saved at:", imageName);
       const imagePath = path.join('public/uploads', imageName);
-      const outputFilePath = path.join('public/outputs/', `output_${imageName}.png`);
+      const outputFilePath = path.join('public/outputs/', `output_${imageName}`);
     
       try {
           const image = sharp(imagePath);
@@ -162,7 +162,7 @@ app.get("/fetch-images", (req, res) => {
       const stats = fs.statSync(filePath);
       return {
         filename: file,
-        path: `public/outputs/${file}`, // Assuming the 'outputs' folder is served statically
+        path: `/outputs/${file}`, // Assuming the 'outputs' folder is served statically
         date: stats.mtime, // Use file modification time for sorting
       };
     });
