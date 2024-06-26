@@ -62,8 +62,8 @@
         margin-top: 20px;
       }
       #captureBtn {
-        height: 180px;
-        width: 180px;
+        height: 120px;
+        width: 120px;
         border: none;
         cursor: pointer;
         position: absolute;
@@ -76,6 +76,13 @@
         background-position: center;
         background-size: contain;
         border-radius: 24px;
+      }
+      h6{
+        cursor: pointer;
+        position: absolute;
+        left: 50%;
+        top: 54%;
+        transform: translate(-50%, -50%);
       }
       #message {
         position: absolute;
@@ -188,7 +195,10 @@
     <section id="main">
       <button id="fullscreenButton"></button>
       <h3 id="message">Get ready countdown will start soon.</h3>
-      <button id="captureBtn" onclick="getStarted()"></button>
+      <div>
+        <button id="captureBtn" onclick="getStarted()"></button>
+        <h6>Open Camera</h6>
+      </div>
       <div id="countdown"></div>
       <video id="video" autoplay></video>
       <div id="imageContainer">
