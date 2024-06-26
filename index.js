@@ -43,7 +43,6 @@ app.post(
   upload.fields([{ name: "image1" }, { name: "image2" }, { name: "image3" }]),
   async (req, res) => {
     const { files } = req;
-    console.log("here in api");
     if (!files || !files.image1 || !files.image2 || !files.image3) {
       return res.status(400).send("All three images are required");
     }
@@ -89,7 +88,6 @@ app.post(
         ])
         .toFile(outputPath);
 
-      console.log("Image processing complete! Image saved at:", imageName);
       const imagePath = path.join('public/uploads', imageName);
       const outputFilePath = path.join('public/outputs/', `output_${imageName}`);
     

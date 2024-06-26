@@ -185,7 +185,7 @@
   </head>
   <body id="fullscreenElement">
     <img id="bg" src="/bg.png" alt="" />
-    <section id="main" >
+    <section id="main">
       <button id="fullscreenButton"></button>
       <h3 id="message">Get ready countdown will start soon.</h3>
       <button id="captureBtn" onclick="getStarted()"></button>
@@ -305,7 +305,6 @@
           return;
         }
         video.style.display = "block";
-        console.log("within fucntion");
         captureBtn.style.display = "none";
         await sleep(2000);
         captureBtn.style.display = "none";
@@ -319,15 +318,21 @@
         try {
           for (let i = 0; i < 3; i++) {
             countdown.style.display = "block";
-            console.log("wait");
             await sleep(1400);
             countdown.style.display = "none";
+            console.log("countdown completed");
             await sleep(100);
             const capturedImage = captureImage();
             capturedImages.push(capturedImage);
             displayImagePreview(capturedImage, currentImageIndex);
-            console.log("clik");
-            await sleep(5000);
+            console.log("image clicked - now sleep");
+            if (i === 2) {
+              console.log(i);
+              await sleep(1000);
+            } else {
+              console.log(i);
+              await sleep(5000);
+            }
             currentImageIndex++;
           }
 
@@ -354,7 +359,6 @@
       }
 
       function generateQRCode(imageUrl) {
-        console.log("herere");
         qrcodeContainer.innerHTML = ""; // Clear previous QR code
         new QRCode(qrcodeContainer, imageUrl);
       }
@@ -386,8 +390,6 @@
           generateQRCode(responseData.imageName);
           await sleep(5000);
           loadingElement.style.display = "none";
-          // qrcodeContainer.style.display = "flex";
-          // resultImage.style.display = "flex";
           finalContainer.style.display = "flex";
         } catch (error) {
           console.error("Error uploading images:", error);
@@ -415,9 +417,6 @@
       function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
-      // generateQRCode(
-      //   "maiores ducimus sed in delectus excepturi molestiae cupiditate a recusandae similique velit totam magni neque quam iure, illo quo!"
-      // );
     </script>
   </body>
 </html>
