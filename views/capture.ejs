@@ -199,14 +199,15 @@
       @media (max-width: 768px) {
         video {
           display: block;
-          margin-top: 100px;
+          margin-top: 200px;
           width: 90vw;
           height: auto;
           object-fit: contain;
         }
 
         #imageContainer {
-          flex-direction: column;
+          width: 100%;
+          display: flex;
           align-items: center;
           margin: 15px 0;
         }
@@ -226,13 +227,24 @@
 
         #qrContainer {
           background-color: whitesmoke;
-          width: 100px;
-          height: 100px;
+          width: 260px;
+          height: 260px;
           display: flex;
           flex-direction: column;
           justify-content: space-evenly;
           align-items: center;
           align-items: center;
+        }
+
+        #finalContainer {
+          padding-top: 100px;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-around;
+          text-align: center;
         }
 
         #captureBtn {
