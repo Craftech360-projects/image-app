@@ -23,7 +23,7 @@
         /* background-image: url("/bg.png"); */
       }
 
-      #bg{
+      #bg {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -84,9 +84,9 @@
         display: none;
       }
       #result {
-        display: none;
-        max-width: 300px;
-        max-height: 800px;
+        /* display: none; */
+        /* max-width: 100%; */
+        max-height: 700px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         margin-top: 20px;
       }
@@ -100,17 +100,24 @@
         position: absolute;
         display: none;
       }
-      #qrcode {
-        width: 200px;
-        height: 200px;
-        display: none;
+      #qrContainer {
+        background-color: whitesmoke;
+        width: 300px;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        align-items: center;
       }
       #finalContainer {
+        padding-top: 200px;
         width: 100%;
         height: 100%;
         display: flex;
         align-items: center;
         justify-content: space-around;
+        text-align: center;
       }
 
       #loading {
@@ -175,8 +182,8 @@
     </style>
   </head>
   <body id="fullscreenElement">
-    <img id="bg" src="/bg.png" alt="">
-    <section id="main">
+    <img id="bg" src="/bg.png" alt="" />
+    <section id="main" >
       <button id="fullscreenButton"></button>
       <h3 id="message">Get ready countdown will start soon.</h3>
       <button id="captureBtn" onclick="getStarted()"></button>
@@ -194,9 +201,15 @@
 
     <span id="loading" class="loader"></span>
 
-    <div id="finalContainer">
-      <img id="result" src="" alt="Result Image" />
-      <div id="qrcode"></div>
+    <div id="finalContainer" style="display: none">
+      <img id="result" src="/main.jpeg" alt="Result Image" />
+      <section>
+        <div id="qrContainer">
+          <div id="qrcode"></div>
+        </div>
+        <h3>Sacn the QR code to</h3>
+        <h3>DOWNLOAD YOUR PHOTO!</h3>
+      </section>
     </div>
 
     <script>
@@ -249,6 +262,7 @@
           fullscreenButton.textContent = "Go Fullscreen";
         }
       });
+
       var loadingElement = document.getElementById("loading");
       var main = document.getElementById("main");
       const video = document.getElementById("video");
@@ -256,6 +270,10 @@
       const countdown = document.getElementById("countdown");
       const message = document.getElementById("message");
       var qrcodeContainer = document.getElementById("qrcode");
+      var finalContainer = document.getElementById("finalContainer");
+      const submitForm = document.getElementById("submitForm");
+      const resultImage = document.getElementById("result");
+
       const imagePreviews = [
         document.getElementById("imagePreview1"),
         document.getElementById("imagePreview2"),
@@ -286,18 +304,15 @@
         }
         video.style.display = "block";
         console.log("within fucntion");
-        // Disable capture button temporarily
         captureBtn.style.display = "none";
         await sleep(2000);
         captureBtn.style.display = "none";
         message.style.display = "block";
         await sleep(2000);
         message.style.display = "none";
-        // Capture images automatically with a delay
         captureImagesWithDelay();
       };
 
-      // Function to capture images automatically with a delay
       async function captureImagesWithDelay() {
         try {
           for (let i = 0; i < 3; i++) {
@@ -310,7 +325,7 @@
             capturedImages.push(capturedImage);
             displayImagePreview(capturedImage, currentImageIndex);
             console.log("clik");
-            await sleep(5000); // Adjust delay (in milliseconds) between captures
+            await sleep(5000);
             currentImageIndex++;
           }
 
@@ -337,11 +352,11 @@
       }
 
       function generateQRCode(imageUrl) {
+        console.log("herere");
         qrcodeContainer.innerHTML = ""; // Clear previous QR code
         new QRCode(qrcodeContainer, imageUrl);
       }
 
-      const submitForm = document.getElementById("submitForm");
       const submitImages = async () => {
         main.style.display = "none";
         loadingElement.style.display = "block";
@@ -365,12 +380,13 @@
 
           const responseData = await response.json();
           console.log("Images uploaded successfully:", responseData);
-          document.getElementById("result").src = `${responseData.imageName}`;
+          resultImage.src = `${responseData.imageName}`;
           generateQRCode(responseData.imageName);
           await sleep(5000);
-          qrcodeContainer.style.display = "flex"; // Show the QR code container
           loadingElement.style.display = "none";
-          document.getElementById("result").style.display = "flex";
+          // qrcodeContainer.style.display = "flex";
+          // resultImage.style.display = "flex";
+          finalContainer.style.display = "flex";
         } catch (error) {
           console.error("Error uploading images:", error);
         }
@@ -397,6 +413,9 @@
       function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
+      // generateQRCode(
+      //   "maiores ducimus sed in delectus excepturi molestiae cupiditate a recusandae similique velit totam magni neque quam iure, illo quo!"
+      // );
     </script>
   </body>
 </html>
