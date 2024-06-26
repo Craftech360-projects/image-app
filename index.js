@@ -48,7 +48,7 @@ app.post(
       return res.status(400).send("All three images are required");
     }
 
-    const templatePath = "./main.jpeg";
+    const templatePath = "./wix.jpeg";
     const folderPath = path.join(__dirname, "public/uploads");
 
     // Create the folder
@@ -60,13 +60,13 @@ app.post(
       // Load the images
       const template = await sharp(templatePath).toBuffer();
       const image1 = await sharp(files.image1[0].buffer)
-        .resize(300, 300)
+        .resize(400, 400)
         .toBuffer();
       const image2 = await sharp(files.image2[0].buffer)
-        .resize(300, 300)
+        .resize(400, 400)
         .toBuffer();
       const image3 = await sharp(files.image3[0].buffer)
-        .resize(300, 300)
+        .resize(400, 400)
         .toBuffer();
 
       // Get the template metadata
@@ -83,9 +83,9 @@ app.post(
       })
         .composite([
           { input: template },
-          { input: image1, top: 130, left: 70 }, // Position the first image
-          { input: image2, top: 495, left: 70 }, // Position the second image
-          { input: image3, top: 850, left: 70 }, // Position the third image
+          { input: image1, top: 118, left: 101 }, // Position the first image
+          { input: image2, top: 622, left: 101 }, // Position the second image
+          { input: image3, top: 1126, left: 101 }, // Position the third image
         ])
         .toFile(outputPath);
 
