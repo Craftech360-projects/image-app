@@ -9,6 +9,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <title>Image Capture and Submit</title>
     <style>
+      #fullscreenElement {
+        width: 100%;
+        height: 100%;
+      }
       body {
         font-family: "Roboto", sans-serif;
         display: flex;
@@ -149,32 +153,94 @@
           box-shadow: 0 2.5em 0 0;
         }
       }
+      #fullscreenButton{
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 10px;
+        width: 100px;
+        height: 100px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
-    <section id="main">
-      <h3 id="message">Get ready countdown will start soon.</h3>
-      <button id="captureBtn" onclick="getStarted()"></button>
-      <div id="countdown"></div>
-      <video id="video" autoplay></video>
-      <div id="imageContainer">
-        <img id="imagePreview1" src="#" alt="Image 1" />
-        <img id="imagePreview2" src="#" alt="Image 2" />
-        <img id="imagePreview3" src="#" alt="Image 3" />
+    <div id="fullscreenElement">
+      <section id="main">
+        <button id="fullscreenButton"></button>
+        <h3 id="message">Get ready countdown will start soon.</h3>
+        <button id="captureBtn" onclick="getStarted()"></button>
+        <div id="countdown"></div>
+        <video id="video" autoplay></video>
+        <div id="imageContainer">
+          <img id="imagePreview1" src="#" alt="Image 1" />
+          <img id="imagePreview2" src="#" alt="Image 2" />
+          <img id="imagePreview3" src="#" alt="Image 3" />
+        </div>
+        <form id="submitForm">
+          <input type="submit" value="Submit Images" />
+        </form>
+      </section>
+
+      <span id="loading" class="loader"></span>
+
+      <div id="finalContainer">
+        <img id="result" src="" alt="Result Image" />
+        <div id="qrcode"></div>
       </div>
-      <form id="submitForm">
-        <input type="submit" value="Submit Images" />
-      </form>
-    </section>
-
-    <span id="loading" class="loader"></span>
-
-    <div id="finalContainer">
-      <img id="result" src="" alt="Result Image" />
-      <div id="qrcode"></div>
     </div>
-
     <script>
+      const fullscreenElement = document.getElementById("fullscreenElement");
+      const fullscreenButton = document.getElementById("fullscreenButton");
+
+      fullscreenButton.addEventListener("click", () => {
+        if (fullscreenElement.requestFullscreen) {
+          fullscreenElement.requestFullscreen();
+        } else if (fullscreenElement.mozRequestFullScreen) {
+          // Firefox
+          fullscreenElement.mozRequestFullScreen();
+        } else if (fullscreenElement.webkitRequestFullscreen) {
+          // Chrome, Safari and Opera
+          fullscreenElement.webkitRequestFullscreen();
+        } else if (fullscreenElement.msRequestFullscreen) {
+          // IE/Edge
+          fullscreenElement.msRequestFullscreen();
+        }
+      });
+
+      document.addEventListener("fullscreenchange", () => {
+        if (document.fullscreenElement) {
+          fullscreenButton.textContent = "";
+        } else {
+          fullscreenButton.textContent = "";
+        }
+      });
+
+      document.addEventListener("webkitfullscreenchange", () => {
+        if (document.webkitFullscreenElement) {
+          fullscreenButton.textContent = "Exit Fullscreen";
+        } else {
+          fullscreenButton.textContent = "Go Fullscreen";
+        }
+      });
+
+      document.addEventListener("mozfullscreenchange", () => {
+        if (document.mozFullScreenElement) {
+          fullscreenButton.textContent = "Exit Fullscreen";
+        } else {
+          fullscreenButton.textContent = "Go Fullscreen";
+        }
+      });
+
+      document.addEventListener("msfullscreenchange", () => {
+        if (document.msFullscreenElement) {
+          fullscreenButton.textContent = "Exit Fullscreen";
+        } else {
+          fullscreenButton.textContent = "Go Fullscreen";
+        }
+      });
       var loadingElement = document.getElementById("loading");
       var main = document.getElementById("main");
       const video = document.getElementById("video");
