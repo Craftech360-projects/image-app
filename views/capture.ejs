@@ -15,22 +15,92 @@
         flex-direction: column;
         align-items: center;
         margin: 0;
-        padding: 20px;
+        padding: 0;
         background: linear-gradient(to right, #000000, #33526d);
         color: #fff;
-      }
-      h1 {
-        margin-bottom: 20px;
+        background-image: url("/bg.png");
       }
       video {
-        display: block;
-        margin: 0 auto;
-        padding: 0;
+        display: none;
+        margin-top: 80px;
         width: 770px;
         height: 800px;
-        /* border: 2px solid #fff; */
-        /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+        object-fit: contain;
       }
+
+      #imageContainer {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 20px 0;
+      }
+      #imageContainer img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border: 2px solid #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        margin: 0 10px;
+        display: none;
+      }
+      #submitForm {
+        display: none;
+        margin-top: 20px;
+      }
+      #captureBtn {
+        height: 268px;
+        width: 268px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3000;
+        background-image: url("/c.gif");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+      }
+      #message {
+        position: absolute;
+        left: 50%;
+        top: 80%;
+        transform: translate(-50%, -50%);
+        z-index: 3000;
+        display: none;
+      }
+      #result {
+        display: none;
+        max-width: 300px;
+        max-height: 800px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        margin-top: 20px;
+      }
+      #countdown {
+        width: 800px;
+        height: 800px;
+        background-image: url("/321.gif");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        position: absolute;
+        display: none;
+      }
+      #qrcode {
+        width: 200px;
+        height: 200px;
+        display: none;
+      }
+      #finalContainer {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+      }
+
       #loading {
         display: none;
         position: absolute;
@@ -79,116 +149,14 @@
           box-shadow: 0 2.5em 0 0;
         }
       }
-
-      #imageContainer {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        margin: 20px 0;
-      }
-      #imageContainer img {
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-        border: 2px solid #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        margin: 0 10px;
-        display: none;
-      }
-      #submitForm {
-        display: none;
-        margin-top: 20px;
-      }
-      #captureBtn {
-        padding: 15px 25px;
-        background-color: #007bff;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 3000;
-      }
-      #message {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 3000;
-        display: none;
-      }
-      #result {
-        display: none;
-        max-width: 300px; /* Ensure the image does not exceed its container */
-        max-height: 800px;
-        /* border: 2px solid #fff; */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        margin-top: 20px;
-      }
-      #downloadBtn,
-      #restartBtn {
-        display: none;
-        margin-top: 10px;
-        padding: 10px 20px;
-        background-color: #28a745;
-        border: none;
-        color: #fff;
-        cursor: pointer;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      }
-      #restartBtn {
-        background-color: #dc3545;
-        margin-left: 10px;
-      }
-      #countdown {
-        width: 800px;
-        height: 800px;
-        background-image: url("/321.gif");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        position: absolute;
-        display: none;
-      }
-      #showMessage {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #888888;
-        opacity: 0.5;
-        position: absolute;
-        z-index: 2000;
-        left: 0;
-        top: 0;
-      }
-      #qrcode {
-        width: 200px;
-        height: 200px;
-        display: none;
-      }
-      #finalContainer {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-      }
     </style>
   </head>
   <body>
     <section id="main">
-      <div id="showMessage"></div>
       <h3 id="message">Get ready countdown will start soon.</h3>
-      <button id="captureBtn" onclick="getStarted()">Let Get Started</button>
+      <button id="captureBtn" onclick="getStarted()"></button>
       <div id="countdown"></div>
-      <!-- <h1>Image Capture and Submit</h1> -->
       <video id="video" autoplay></video>
-
       <div id="imageContainer">
         <img id="imagePreview1" src="#" alt="Image 1" />
         <img id="imagePreview2" src="#" alt="Image 2" />
@@ -198,11 +166,11 @@
         <input type="submit" value="Submit Images" />
       </form>
     </section>
+
     <span id="loading" class="loader"></span>
+
     <div id="finalContainer">
       <img id="result" src="" alt="Result Image" />
-      <!-- <button id="downloadBtn">Download Result Image</button> -->
-      <!-- <button id="restartBtn">Restart</button> -->
       <div id="qrcode"></div>
     </div>
 
@@ -212,7 +180,6 @@
       const video = document.getElementById("video");
       const captureBtn = document.getElementById("captureBtn");
       const countdown = document.getElementById("countdown");
-      const showMessage = document.getElementById("showMessage");
       const message = document.getElementById("message");
       var qrcodeContainer = document.getElementById("qrcode");
       const imagePreviews = [
@@ -223,7 +190,6 @@
       let currentImageIndex = 0;
       const capturedImages = [];
 
-      // Start the video stream
       async function startVideoStream() {
         const constraints = {
           video: true,
@@ -244,15 +210,15 @@
           alert("All images have been captured");
           return;
         }
+        video.style.display = "block";
         console.log("within fucntion");
         // Disable capture button temporarily
-        captureBtn.disabled = true;
+        captureBtn.style.display = "none";
         await sleep(2000);
         captureBtn.style.display = "none";
         message.style.display = "block";
         await sleep(2000);
         message.style.display = "none";
-        showMessage.style.display = "none";
         // Capture images automatically with a delay
         captureImagesWithDelay();
       };
@@ -274,18 +240,14 @@
             currentImageIndex++;
           }
 
-          // Enable submit form and display it after capturing all images
-          // document.getElementById("submitForm").style.display = "block";
           submitImages();
         } catch (error) {
           console.error("Error capturing image:", error);
         } finally {
-          // Re-enable capture button after capturing images
           captureBtn.disabled = false;
         }
       }
 
-      // Function to capture image from the video stream
       function captureImage() {
         const canvas = document.createElement("canvas");
         canvas.width = 960;
@@ -295,21 +257,16 @@
         return canvas.toDataURL("image/png");
       }
 
-      // Function to display captured image preview
       function displayImagePreview(imageDataURL, index) {
         imagePreviews[index].style.display = "block";
         imagePreviews[index].src = imageDataURL;
       }
 
-      // Function to generate and display QR code
       function generateQRCode(imageUrl) {
         qrcodeContainer.innerHTML = ""; // Clear previous QR code
         new QRCode(qrcodeContainer, imageUrl);
       }
 
-      // generateQRCode(imageUrl);
-
-      // Form submission handling (sending images to server)
       const submitForm = document.getElementById("submitForm");
       const submitImages = async () => {
         main.style.display = "none";
@@ -317,13 +274,11 @@
 
         const formData = new FormData();
 
-        // Collect image data URLs
         for (let i = 0; i < capturedImages.length; i++) {
           const blob = dataURLToBlob(capturedImages[i]);
           formData.append(`image${i + 1}`, blob, `image${i + 1}.png`);
         }
 
-        // Send images to server
         try {
           const response = await fetch("/upload-images", {
             method: "POST",
@@ -342,16 +297,11 @@
           qrcodeContainer.style.display = "flex"; // Show the QR code container
           loadingElement.style.display = "none";
           document.getElementById("result").style.display = "flex";
-
-          // Show download and restart buttons
-          // document.getElementById("downloadBtn").style.display = "block";
-          // document.getElementById("restartBtn").style.display = "block";
         } catch (error) {
           console.error("Error uploading images:", error);
         }
       };
 
-      // Convert data URL to Blob
       function dataURLToBlob(dataURL) {
         const parts = dataURL.split(",");
         const byteString = atob(parts[1]);
@@ -364,52 +314,12 @@
         return new Blob([ab], { type: mimeString });
       }
 
-      // Download button functionality
-      // document
-      //   .getElementById("downloadBtn")
-      //   .addEventListener("click", function () {
-      //     const resultImage = document.getElementById("result");
-      //     const imageSrc = resultImage.src;
-
-      //     if (imageSrc) {
-      //       const a = document.createElement("a");
-      //       a.href = imageSrc;
-      //       a.download = "result_image.png";
-      //       document.body.appendChild(a);
-      //       a.click();
-      //       document.body.removeChild(a);
-      //     } else {
-      //       alert("No image to download.");
-      //     }
-      //   });
-
-      // Restart button functionality
       document.getElementById("qrcode").addEventListener("click", function () {
         window.location.reload();
-        // // Reset captured images array and current image index
-        // capturedImages.length = 0;
-        // currentImageIndex = 0;
-
-        // // Reset image previews
-        // imagePreviews.forEach((preview) => {
-        //   preview.src = "#";
-        // });
-
-        // // Reset result image display
-        // document.getElementById("result").src = "";
-        // document.getElementById("result").style.display = "none";
-
-        // // Reset form display
-        // document.getElementById("submitForm").style.display = "none";
-
-        // // Show main section again
-        // main.style.display = "block";
       });
 
-      // Start the video stream when the page loads
       startVideoStream();
 
-      // Utility function: sleep for a given time in milliseconds
       function sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
