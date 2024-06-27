@@ -360,7 +360,7 @@
         document.getElementById("imagePreview2"),
         document.getElementById("imagePreview3"),
       ];
-      let currentImageIndex = 0;
+      var currentImageIndex = 0;
       const capturedImages = [];
 
       async function startVideoStream() {
@@ -490,6 +490,7 @@
 
       document.getElementById("qrcode").addEventListener("click", function () {
         //window.location.reload();
+        currentImageIndex = 0;
         qrcodeContainer.innerHTML = "";
         resultImage.src = "";
         finalContainer.style.display = "none";
