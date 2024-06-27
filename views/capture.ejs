@@ -489,7 +489,11 @@
       }
 
       document.getElementById("qrcode").addEventListener("click", function () {
-        window.location.reload();
+        //window.location.reload();
+        qrcodeContainer.innerHTML = "";
+        resultImage.src = "";
+        finalContainer.style.display = "none";
+        main.style.display = "block";
       });
 
       startVideoStream();
