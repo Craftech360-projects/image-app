@@ -185,10 +185,9 @@
       }
       #fullscreenButton {
         position: absolute;
-        left: 0;
-        top: 0;
-        margin: 10px;
-        width: 100px;
+        top: 8%;
+        transform: translate(-50%, -50%);
+        width: 320px;
         height: 100px;
         background-color: transparent;
         border: none;
@@ -360,7 +359,7 @@
         document.getElementById("imagePreview2"),
         document.getElementById("imagePreview3"),
       ];
-      var currentImageIndex = 0;
+      let currentImageIndex = 0;
       const capturedImages = [];
 
       async function startVideoStream() {
@@ -489,20 +488,7 @@
       }
 
       document.getElementById("qrcode").addEventListener("click", function () {
-        //window.location.reload();
-        currentImageIndex = 0;
-        qrcodeContainer.innerHTML = "";
-        resultImage.src = "";
-        finalContainer.style.display = "none";
-        video.style.display = "none";
-        document.getElementById("imagePreview1").src = '';
-        document.getElementById("imagePreview2").src = '';
-        document.getElementById("imagePreview3").src = '';
-        document.getElementById("imagePreview1").style.display = 'none';
-        document.getElementById("imagePreview2").style.display = 'none';
-        document.getElementById("imagePreview3").style.display = 'none';
-        captureBtn.style.display = "block";
-        main.style.display = "block";
+        window.location.reload();
       });
 
       startVideoStream();
