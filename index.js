@@ -37,6 +37,9 @@ app.get("/capture", (req, res) => {
 app.get("/show", (req, res) => {
   res.render("show");
 });
+app.get("/api", (req, res) => {
+  res.render("api");
+});
 
 app.post(
   "/upload-images",
@@ -88,54 +91,69 @@ app.post(
         ])
         .toFile(outputPath);
 
-      const imagePath = path.join('public/uploads', imageName);
-      const outputFilePath = path.join('public/outputs/', `output_${imageName}`);
-    
+      const imagePath = path.join("public/uploads", imageName);
+      const outputFilePath = path.join(
+        "public/outputs/",
+        `output_${imageName}`
+      );
+
       try {
-          const image = sharp(imagePath);
-          const metadata = await image.metadata();
-    
-          await image
-              .extend({
-                  left: metadata.width,
-                  background: { r: 255, g: 255, b: 255, alpha: 1 }
-              })
-              .toFile(outputFilePath);
-    
-          // res.json({ imageName:imageName });
+        const image = sharp(imagePath);
+        const metadata = await image.metadata();
+
+        await image
+          .extend({
+            left: metadata.width,
+            background: { r: 255, g: 255, b: 255, alpha: 1 },
+          })
+          .toFile(outputFilePath);
+
+        // res.json({ imageName:imageName });
       } catch (error) {
-          console.error('Error processing image:', error);
-          res.status(500).send('Error processing image');
+        console.error("Error processing image:", error);
+        res.status(500).send("Error processing image");
       }
-      await uploadImageToSupabase(imageName, outputPath, res);
+      // await uploadImageToSupabase(imageName, outputPath, res);
     } catch (err) {
       console.error("Error processing images:", err);
       res.status(500).send("Error processing images");
     }
   }
 );
+const axios = require("axios");
 
-async function uploadImageToSupabase(imageName, outputPath, res) {
+// Function to call the external API
+async function callApi() {
+  const url =
+    "http://192.168.0.150:1500/api/start?mode=print&password=yOAUhiYNG1x4CCKa";
+
   try {
-    // await mergeImages(imageName, res);
-    const fileBuffer = fs.readFileSync(outputPath);
-    const { data, error } = await supabase.storage
-      .from("test-bucket") // Replace with your actual bucket name
-      .upload(`public/${imageName}`, fileBuffer, {
-        cacheControl: "3600",
-        upsert: false,
-      });
-
-    if (error) {
-      throw error;
-    }
-    const imageUrl = `https://aimistcqlndneimalstl.supabase.co/storage/v1/object/public/test-bucket/${data.path}`;
-    res.json({ imageName: imageUrl });
+    const response = await axios.get(url);
+    console.log("API call successful:", response.data);
+    return response.data; // Return data if needed
   } catch (error) {
-    console.error("Error uploading image to Supabase:", error);
-    res.status(500).send("Error uploading image to Supabase");
+    console.error("Error calling the API:", error);
+    throw error; // Throw error to catch it later
   }
 }
+
+// Define the /dslr-click route
+app.post("/dslr-click", async (req, res) => {
+  console.log("dslr-click route hit");
+
+  try {
+    const apiResponse = await callApi();
+    res.status(200).json({
+      message: "API call successful",
+      data: apiResponse, // Send back the data from the external API if needed
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to call external API",
+      error: error.toString(), // Send back the error message
+    });
+  }
+});
 
 // Endpoint to fetch images
 app.get("/fetch-images", (req, res) => {

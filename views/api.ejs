@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script defer src="/face-api.min.js"></script>
+    <title>Image Capture and Submit</title>
+    <style>
+      /* Your existing CSS code */
+      body {
+        width: 100vw;
+        height: 100vh;
+        font-family: "Roboto", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        background-color: #1d1d1d;
+      }
+
+      video {
+        display: none;
+        margin-top: 200px;
+        width: 770px;
+        height: 700px;
+        object-fit: contain;
+      }
+
+      #imageContainer {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 30px 0;
+      }
+
+      #imageContainer img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border: 2px solid #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        margin: 0 30px;
+        display: none;
+      }
+
+      #captureBtn {
+        height: 120px;
+        width: 120px;
+        border: none;
+        cursor: pointer;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3000;
+        background-image: url("/c.gif");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        border-radius: 24px;
+      }
+
+      #result {
+        max-height: 700px;
+        box-shadow: rgba(255, 255, 255) 0px 3px 8px;
+        margin-top: 20px;
+      }
+      #finalContainer {
+        padding-top: 100px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        text-align: center;
+      }
+      #qrContainer {
+        background-color: whitesmoke;
+        width: 300px;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        align-items: center;
+      }
+      /* Mobile specific styles */
+      @media (max-width: 768px) {
+        video {
+          display: block;
+          margin-top: 200px;
+          width: 90vw;
+          height: auto;
+          object-fit: contain;
+        }
+
+        #imageContainer {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          margin: 15px 0;
+        }
+
+        #imageContainer img {
+          width: 80px;
+          height: 80px;
+          margin: 10px 0;
+        }
+
+        #result {
+          /* max-width: 90vw; */
+          max-height: 300px;
+          /* width: 100%; */
+          margin-top: 30px;
+        }
+
+        #qrContainer {
+          background-color: whitesmoke;
+          width: 260px;
+          height: 260px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-evenly;
+          align-items: center;
+          align-items: center;
+        }
+
+        #finalContainer {
+          padding-top: 100px;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-around;
+          text-align: center;
+        }
+
+        #captureBtn {
+          height: 80px;
+          width: 80px;
+        }
+
+        #countdown {
+          width: 200px;
+          height: 200px;
+        }
+      }
+    </style>
+  </head>
+
+  <body id="fullscreenElement">
+    <button id="captureBtn" onclick="getStarted()"></button>
+    <video id="video" autoplay></video>
+    <canvas
+      id="mycanvas"
+      width="770"
+      height="700"
+      style="display: none"
+    ></canvas>
+    <div id="imageContainer">
+      <img id="imagePreview1" src="#" alt="Image 1" />
+      <img id="imagePreview2" src="#" alt="Image 2" />
+      <img id="imagePreview3" src="#" alt="Image 3" />
+    </div>
+    <div id="finalContainer" style="display: none">
+      <img id="resultImage" src="#" alt="Result Image" />
+      <section>
+        <div id="qrContainer">
+          <div id="qrcode"></div>
+          result
+        </div>
+        <h3>Sacn the QR code to</h3>
+        <h3>DOWNLOAD YOUR PHOTO!</h3>
+      </section>
+    </div>
+    <script>
+      const video = document.getElementById("video");
+      const finalContainer = document.getElementById("finalContainer");
+      const resultImage = document.getElementById("resultImage");
+      var qrcodeContainer = document.getElementById("qrcode");
+      const imagePreviews = [
+        document.getElementById("imagePreview1"),
+        document.getElementById("imagePreview2"),
+        document.getElementById("imagePreview3"),
+      ];
+      const mycanvas = document.getElementById("mycanvas");
+      let currentImageIndex = 0;
+      let HappyCntr = 0;
+      let captured = false;
+      const capturedImages = [];
+
+      async function startVideoStream() {
+        const constraints = { video: true, audio: false };
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          video.srcObject = stream;
+
+          // Wait for the video to start playing
+          video.onloadedmetadata = () => {
+            video.play();
+            // Adjust video and canvas dimensions once the video is ready
+            video.width = video.videoWidth;
+            video.height = video.videoHeight;
+            mycanvas.width = video.videoWidth;
+            mycanvas.height = video.videoHeight;
+          };
+          return true;
+        } catch (error) {
+          console.error("Error accessing the camera:", error);
+          return false;
+        }
+      }
+
+      async function getStarted() {
+        // Hide the button, start the camera and face detection
+        document.getElementById("captureBtn").style.display = "none";
+        video.style.display = "block";
+        const streamStarted = await startVideoStream();
+        if (streamStarted) {
+          // Load face-api models and start detecting smiles
+          Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
+            faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+            faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+            faceapi.nets.faceExpressionNet.loadFromUri("/models"),
+          ]).then(detectSmiles);
+        }
+      }
+
+      async function detectSmiles() {
+        const canvas = faceapi.createCanvasFromMedia(video);
+        // document.body.append(canvas); // Optionally append the canvas to the DOM
+        const displaySize = { width: video.width, height: video.height };
+        faceapi.matchDimensions(canvas, displaySize);
+
+        let HappyCntr = 0;
+        let captured = false; // To prevent detection during the delay
+
+        const interval = setInterval(async () => {
+          const detections = await faceapi
+            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceExpressions();
+
+          if (!captured && detections.length > 0) {
+            const resizedDetections = faceapi.resizeResults(
+              detections,
+              displaySize
+            );
+            canvas
+              .getContext("2d")
+              .clearRect(0, 0, canvas.width, canvas.height);
+            // faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+
+            if (detections[0].expressions.happy > 0.9) {
+              HappyCntr++;
+
+              if (HappyCntr > 2) {
+                callApi();
+                captureImage(); // Call your image capture function
+                // Increment image index
+                if (currentImageIndex >= 1) {
+                  clearInterval(interval); // Stop detection after 3 images
+                  console.log("Captured 1 image");
+                }
+                HappyCntr = 0;
+                captured = true; // Temporarily stop detection
+              }
+            } else {
+              HappyCntr = 0;
+            }
+          }
+        }, 100);
+      }
+
+      async function callApi() {
+        try {
+          const response = await fetch("/dslr-click", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: "Smile detected!" }),
+          });
+
+          if (!response.ok) {
+            throw new Error("API call failed");
+          }
+
+          console.log("API call successful:", await response.json());
+        } catch (error) {
+          console.error("Error calling API:", error);
+        }
+      }
+
+      function captureImage() {
+        const context = mycanvas.getContext("2d");
+        context.drawImage(video, 0, 0, mycanvas.width, mycanvas.height);
+        const imageDataUrl = mycanvas.toDataURL("image/jpeg");
+        console.log("Captured image:", imageDataUrl);
+        capturedImages.push(imageDataUrl);
+        displayImagePreview(imageDataUrl, currentImageIndex);
+        currentImageIndex++;
+      }
+
+      function displayImagePreview(imageDataUrl, index) {
+        imagePreviews[index].style.display = "block";
+        imagePreviews[index].src = imageDataUrl;
+      }
+    </script>
+  </body>
+</html>
