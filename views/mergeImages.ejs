@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Start Process</title>
+    <style>
+      #message {
+        margin-top: 20px;
+        display: none;
+      }
+      #resultImage {
+        /* display: none; */
+        /* max-width: 100%; */
+        max-height: 700px;
+        box-shadow: rgba(255, 255, 255) 0px 3px 8px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="mergeButton">Start Process</button>
+    <div id="message"></div>
+    <img id="resultImage" style="display: none; margin-top: 20px" />
+
+    <script>
+      document
+        .getElementById("mergeButton")
+        .addEventListener("click", async () => {
+          const button = document.getElementById("mergeButton");
+          const messageDiv = document.getElementById("message");
+          const resultImage = document.getElementById("resultImage");
+
+          // Disable the button
+          button.hidden = true;
+          messageDiv.style.display = "none";
+          resultImage.style.display = "none";
+
+          try {
+            const response = await fetch("http://localhost:3001/merge-images");
+
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+
+            const data = await response.json();
+            console.log("Data received:", data);
+
+            // Assuming the response contains the URL of the merged image
+            if (data.imageUrl) {
+              messageDiv.textContent = "Merge successful!";
+              resultImage.src = data.imageUrl; // Set the image source
+              resultImage.style.display = "block"; // Show the image
+            } else {
+              messageDiv.textContent = "Merge failed. No image URL returned.";
+            }
+          } catch (error) {
+            console.error("Error calling the API:", error);
+            messageDiv.textContent = "An error occurred while merging images.";
+          } finally {
+            // Re-enable the button after the request completes
+            button.disabled = false;
+            messageDiv.style.display = "block"; // Show the message
+          }
+        });
+    </script>
+  </body>
+</html>

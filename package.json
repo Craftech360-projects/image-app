@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "@supabase/supabase-js": "^2.43.5",
+    "axios": "^1.7.7",
     "canvas": "^2.11.2",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
