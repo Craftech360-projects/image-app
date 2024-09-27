@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Gallery</title>
+  <style>
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .gallery img {
+      margin: 10px;
+      width: 200px;
+      height: auto;
+    }
+    .pagination {
+      margin: 20px;
+    }
+    .reload-btn {
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Image Gallery (Page <%= currentPage %> of <%= totalPages %>)</h1>
+
+  <!-- Image Gallery -->
+  <div class="gallery">
+    <% images.forEach(function(image) { %>
+      <div>
+        <img src="/images/<%= image %>" alt="<%= image %>" />
+      </div>
+    <% }); %>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination">
+    <% if (currentPage > 1) { %>
+      <a href="/image-gallery?page=<%= currentPage - 1 %>">Previous</a>
+    <% } %>
+
+    <% if (currentPage < totalPages) { %>
+      <a href="/image-gallery?page=<%= currentPage + 1 %>">Next</a>
+    <% } %>
+  </div>
+
+  <!-- Reload Button -->
+  <div class="reload-btn">
+    <button onclick="location.replace(`/image-gallery`)">Reload</button>
+  </div>
+
+</body>
+</html>

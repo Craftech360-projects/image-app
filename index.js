@@ -125,17 +125,21 @@ const axios = require("axios");
 // Function to call the external API
 async function callApi() {
   const url =
-    "http://192.168.0.150:1500/api/start?mode=print&password=yOAUhiYNG1x4CCKa";
+    "http://localhost:1500/api/start?mode=print&password=1q_15uD-Wjiit4ii";
 
   try {
     const response = await axios.get(url);
-    console.log("API call successful:", response.data);
+    console.log("API call successful:", response);
     return response.data; // Return data if needed
   } catch (error) {
     console.error("Error calling the API:", error);
     throw error; // Throw error to catch it later
   }
 }
+
+setInterval(() => {
+  callApi()
+}, 10000);
 
 // Define the /dslr-click route
 app.post("/dslr-click", async (req, res) => {
